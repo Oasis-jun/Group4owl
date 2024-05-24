@@ -11,7 +11,7 @@
  Target Server Version : 80034
  File Encoding         : 65001
 
- Date: 20/05/2024 21:32:35
+ Date: 24/05/2024 15:40:31
 */
 
 SET NAMES utf8mb4;
@@ -30,7 +30,7 @@ CREATE TABLE `energy`  (
   UNIQUE INDEX `id_UNIQUE`(`id` ASC) USING BTREE,
   INDEX `usr_name_idx`(`user_name` ASC) USING BTREE,
   CONSTRAINT `usr_name` FOREIGN KEY (`user_name`) REFERENCES `user` (`user_name`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of energy
@@ -75,6 +75,24 @@ INSERT INTO `energy` VALUES (46, 'Lily', 10, '2024-05-19');
 INSERT INTO `energy` VALUES (47, 'Lily', 10, '2024-05-19');
 INSERT INTO `energy` VALUES (48, 'Lily', 10, '2024-05-17');
 INSERT INTO `energy` VALUES (49, 'Lily', 10, '2024-05-17');
+INSERT INTO `energy` VALUES (50, '222', 10, '2024-05-20');
+INSERT INTO `energy` VALUES (52, '222', 10, '2024-05-20');
+INSERT INTO `energy` VALUES (53, 'Tom', 10, '2024-05-20');
+INSERT INTO `energy` VALUES (55, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (56, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (57, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (58, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (59, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (60, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (61, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (62, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (63, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (64, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (65, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (66, 'zwl11', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (67, 'Tom', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (68, 'Tom', 10, '2024-05-23');
+INSERT INTO `energy` VALUES (69, 'Tom', 10, '2024-05-23');
 
 -- ----------------------------
 -- Table structure for meeting
@@ -93,7 +111,7 @@ CREATE TABLE `meeting`  (
 -- ----------------------------
 -- Records of meeting
 -- ----------------------------
-INSERT INTO `meeting` VALUES ('1', '2024-05-21', '18:16', '1', '1');
+INSERT INTO `meeting` VALUES ('1', '2024-05-21', '18:16', 'sustainable', 'David');
 INSERT INTO `meeting` VALUES ('2', '2024-05-18', '23:19', 'xiaohongshu', 'ljj');
 INSERT INTO `meeting` VALUES ('3', '2024-05-31', '22:27', 'assignment', 'lxj');
 
@@ -153,16 +171,17 @@ CREATE TABLE `user`  (
   `energy` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`, `user_name`) USING BTREE,
   INDEX `user_name`(`user_name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'Tom', 'admin', 'admin123', 'Administer', 60);
+INSERT INTO `user` VALUES (1, 'Tom', 'admin', 'admin123', 'Administer', 110);
 INSERT INTO `user` VALUES (2, 'Jack', '002', '111111', 'Leader', 70);
 INSERT INTO `user` VALUES (3, 'Lily', '003', '111111', 'Employee', 90);
 INSERT INTO `user` VALUES (5, 'w1', '1111111', '1111111', 'Employee', 120);
 INSERT INTO `user` VALUES (6, 'w2', '2222222', '2222222', 'Employee', 10);
-INSERT INTO `user` VALUES (8, '222', '222', '222', 'Employee', 50);
+INSERT INTO `user` VALUES (8, '222', '222', '222', 'Employee', 70);
+INSERT INTO `user` VALUES (10, 'zwl11', '123456', '123456', 'Employee', 120);
 
 SET FOREIGN_KEY_CHECKS = 1;
