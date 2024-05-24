@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+  <title>Online Conference</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .parallax {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+    .parallax img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+    #container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.2); /* 半透明背景 */
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px); /* 毛玻璃效果 */
+      -webkit-backdrop-filter: blur(10px); /* 为兼容性添加前缀 */
+      position: relative;
+      z-index: 1;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"],
+    button {
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #adminControls button {
+      margin-right: 10px;
+    }
+    #remoteVideo {
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    #participants {
+      list-style-type: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+    .participant .avatar {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%; /* Circular avatar */
+      background-color: #ccc; /* Default background color */
+      text-align: center;
+      line-height: 30px;
+      margin-right: 10px;
+    }
+    #chatBox {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.2); /* 半透明背景 */
+      overflow-y: scroll;
+      height: 200px; /* Fixed height */
+      overflow-wrap: break-word; /* Ensure long words break correctly */
+    }
+    #chatInput {
+      width: calc(100% - 70px);
+      margin-right: 10px;
+    }
+    #energyDisplay {
+      margin-bottom: 10px;
+    }
+    .message {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .avatar-container {
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+    }
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      color: #fff;
+    }
+    .message-content {
+      background-color: #f0f0f0;
+      padding: 8px;
+      border-radius: 8px;
+    }
+    .message-right .message-content {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .message-right .avatar-container {
+      margin-left: auto;
+      margin-right: 0;
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #666;
+    }
+    .navigation {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+    .navigation a {
+      text-decoration: none;
+      color: #359381; /* Light blue color */
+      padding: 10px 15px;
+      border-radius: 5px;
+
+      font-weight: bold; /* Make the text bold */
+      margin: 0 10px;
+    }
+
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.0.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+<section class="parallax">
+  <img src="img/hill1.png" id="hill1">
+  <img src="img/hill2.png" id="hill2">
+  <img src="img/hill3.png" id="hill3">
+  <img src="img/hill4.png" id="hill4">
+  <img src="img/hill5.png" id="hill5">
+  <img src="img/tree.png" id="tree">
+  <img src="img/leaf.png" id="leaf">
+  <img src="img/plant.png" id="plant">
+</section>
+
+<header>
+  <h2 class="logo"></h2>
+  <nav class="navigation">
+    <a href="index.html">Home</a>
+    <a href="notice.html">Introduction</a>
+    <a href="user.html">Contacts</a>
+    <a href="message.html">Message</a>
+    <a href="chooseMeeting.html">Meeting</a>
+    <a href="creatMeeting.html">ManageMeeting</a>
+    <a href="farm.html">Farm</a>
+    <a href="tree.html">Tree</a>
+    <a href="ranking.html">Ranking</a>
+  </nav>
+</header>
+
+<div id="container">
+  <div>
+    <p>Welcome, <span id="usernameDisplay"></span>!</p>
+    <label for="username">Please enter your nickname:</label>
+    <input type="text" id="username">
+    <button onclick="joinConference()">Join Conference</button>
+  </div>
+  <div id="adminControls" style="display:none;">
+    <button onclick="startCall()">Start Call</button>
+    <button onclick="endCall()">End Call</button>
+  </div>
+  <h3> Chat </h3>
+  <div id="systemMessageBox"></div>
+  <div id="chatBox"></div>
+  <div>
+    <input type="text" id="chatInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <button onclick="leaveConference()">Leave Conference</button>
+  <div id="energyValue"></div>
+  <div id="energyDisplay"></div>
+  <p>Participants</p>
+  <ul id="participants"></ul>
+</div>
+
+<div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+  <p id="popupMessage"></p>
+</div>
+
+<script>
+  // JavaScript代码
+
+  // 显示弹窗函数
+  function showPopup(message) {
+    var popup = document.getElementById('popup');
+    var popupMessage = document.getElementById('popupMessage');
+    popupMessage.textContent = message;
+    popup.style.display = 'block';
+  }
+
+  // 隐藏弹窗函数
+  function hidePopup() {
+    var popup = document.getElementById('popup');
+    popup.style.display = 'none';
+  }
+
+
+  var stompClient = null;
+  var username = ''; // 用户昵称
+  var isJoined = false; // 是否已经成功加入会议的标志
+
+
+  // var stompClient = null;
+  var localStream = null;
+  // var username = null;
+  var remoteVideo = document.getElementById('remoteVideo');
+  var participantsList = document.getElementById('participants');
+  var chatBox = document.getElementById('chatBox');
+  var energyDisplay = document.getElementById('energyDisplay'); // 能量值显示的地方
+  var reconnectInterval = 1000; // 重连间隔时间 (毫秒)
+  var isConnected = false; // 连接状态标志
+  // var energy = 1; // 能量值
+  // var lastMessageTime = null; // 上次发送消息的时间
+
+  var systemMessageBox = document.getElementById('systemMessageBox');
+
+  // Colors for avatars
+  var avatarColors = ['#ff6347', '#4682b4', '#6a5acd', '#32cd32', '#ff69b4'];
+
+
+  var cartItems = sessionStorage.getItem('username');
+  document.getElementById('usernameDisplay').textContent = cartItems;
+
+  // 获取用户能量值并显示在页面上
+  function fetchUserEnergy() {
+    var userId = sessionStorage.getItem('userId'); // 从sessionStorage中获取用户ID
+    if (userId) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/user/getEnergy?userId=" + userId, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var energyValue = document.getElementById("energyValue");
+          energyValue.textContent = "Energy: " + xhr.responseText; // 将能量值显示在页面上
+        }
+      };
+      xhr.send();
+    }
+  }
+
+  // 在页面加载完成后调用函数
+  window.onload = function () {
+    fetchUserEnergy();
+  };
+
+  // 连接函数中添加弹窗显示和隐藏
+  function connect() {
+    showPopup('Please wait while connecting to the conference room...'); // 在连接过程中显示提示
+    var socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+      hidePopup(); // 连接成功后隐藏提示
+      console.log('Connected: ' + frame);
+      isJoined = true;
+      isConnected = true;
+      stompClient.subscribe('/topic/video', function(message) {
+        handleRemoteVideoData(message.binaryBody);
+      });
+      stompClient.subscribe('/topic/users', function(message) {
+        updateParticipantsList(JSON.parse(message.body));
+      });
+      stompClient.subscribe('/topic/chat', function(message) {
+        displayMessage(JSON.parse(message.body));
+      });
+      stompClient.send("/app/join", {}, username);
+    }, function(error) {
+      console.error('STOMP error:', error);
+      isConnected = false;
+      setTimeout(function() {
+        if (!isConnected) {
+          connect();
+        }
+      }, reconnectInterval);
+    });
+  }
+
+  function startCall() {
+    if (!stompClient || !stompClient.connected || username !== 'admin') {
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(function(stream) {
+              localStream = stream;
+              document.getElementById('remoteVideo').style.display = 'block';
+              document.getElementById('remoteVideo').srcObject = localStream;
+              sendVideoData();
+            }).catch(function(error) {
+      console.error('Error accessing media devices:', error);
+    });
+  }
+
+  function sendVideoData() {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    var videoElement = document.getElementById('remoteVideo');
+
+    canvas.width = 640;
+    canvas.height = 480;
+
+    function captureFrame() {
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(function(blob) {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          if (stompClient && stompClient.connected) {
+            stompClient.send("/app/video", {}, reader.result);
+          }
+        };
+        reader.readAsArrayBuffer(blob);
+      });
+      requestAnimationFrame(captureFrame);
+    }
+
+    captureFrame();
+
+    console.log("send video successful");
+  }
+
+  function handleRemoteVideoData(data) {
+    console.log("handle video");
+    var blob = new Blob([data], { type: 'video/webm' });
+    remoteVideo.src = URL.createObjectURL(blob);
+    console.log("handle video successful");
+  }
+
+  function updateParticipantsList(users) {
+    var participantsHTML = '';
+    users.forEach(function(user, index) {
+      var colorIndex = index % avatarColors.length;
+      var avatarColor = avatarColors[colorIndex];
+      participantsHTML += '<li class="participant"><div class="avatar" style="background-color: ' + avatarColor + ';">' + user.charAt(0).toUpperCase() + '</div><span>' + user + '</span></li>';
+    });
+    participantsList.innerHTML = participantsHTML;
+  }
+
+  var messageCount = 1; // 全局变量，用于计数发送的消息次数
+
+  function sendMessage() {
+
+    if (!isJoined) {
+      alert('Please join the conference first.');
+      return;
+    }
+    var messageInput = document.getElementById('chatInput');
+    var message = messageInput.value.trim();
+    if (message !== '') {
+      console.log('Sending message:', message);
+      var chatMessage = {
+        type: 'CHAT',
+        content: message,
+        sender: username
+      };
+
+      // // 检查是否超过能量值上限
+      // if (energy >= 30) {
+      //   console.log("You have reached the maximum energy limit for today in the conference.");
+      //   return;
+      // }
+
+      // 更新能量值显示
+
+      energyDisplay.textContent = 'Message Count: ' + messageCount + '(Energy increases once for every five messages sent)';
+
+
+
+      // Choose avatar color based on participant list length
+      var colorIndex = participantsList.getElementsByTagName('li').length % avatarColors.length;
+      var avatarColor = avatarColors[colorIndex];
+
+      stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
+      messageInput.value = '';
+
+
+      messageCount++;
+
+
+      if (messageCount % 5 === 0) {
+        increaseEnergyBySteal();
+        messageCount = 0;
+        updateEnergyDisplay()
+      }
+
+
+      fetchUserEnergy();
+    }
+  }
+
+  function displayMessage(chatMessage) {
+    console.log('Received message:', chatMessage);
+
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+
+    // Create avatar container
+    var avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('avatar-container');
+
+    var messageContent = document.createElement('div');
+    messageContent.classList.add('message-content');
+
+    // Set background color for avatar
+    var colorIndex = participantsList.getElementsByTagName('li').length % avatarColors.length;
+    var avatarColor = avatarColors[colorIndex];
+    avatarContainer.style.backgroundColor = avatarColor;
+
+    // Create avatar element
+    var messageAvatar = document.createElement('div');
+    messageAvatar.classList.add('avatar');
+    messageAvatar.textContent = chatMessage.sender.charAt(0).toUpperCase();
+
+    var nameSpan = document.createElement('span');
+    nameSpan.textContent = chatMessage.sender + ': ';
+
+    var messageText = document.createElement('span');
+    messageText.textContent = chatMessage.content;
+
+    // Create timestamp element
+    var timestampElement = document.createElement('div');
+    timestampElement.classList.add('timestamp');
+    var timestamp = new Date();
+    timestampElement.textContent = timestamp.toLocaleTimeString();
+
+    messageContent.appendChild(nameSpan);
+    messageContent.appendChild(messageText);
+
+    avatarContainer.appendChild(messageAvatar);
+    messageElement.appendChild(avatarContainer);
+    messageElement.appendChild(messageContent);
+    messageElement.appendChild(timestampElement);
+
+    if (chatMessage.sender === username) {
+      messageElement.classList.add('message-right'); // Right align user's messages
+    }
+
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  var lastMessageTime = null; // Store the timestamp of the last message sent
+
+  // Function to update the displayed energy value
+  function updateEnergyDisplay() {
+    var energyDisplay = document.getElementById('energyDisplay');
+    energyDisplay.textContent = 'Energy: ' + energy;
+  }
+
+
+  // // Function to increase energy
+  // function increaseEnergy(amount) {
+  //   // Update energy value
+  //   energy += amount;
+  //   // Update displayed energy value
+  //   updateEnergyDisplay();
+  // }
+
+  function increaseEnergyBySteal() {
+    var username = sessionStorage.getItem('username');
+    if (!username) {
+      console.error('在 sessionStorage 中找不到用户名。');
+      alert('请登录以收获能量。');
+      return;
+    }
+
+    const currentTime = new Date().toISOString();
+
+    const postData = {
+      username: username,
+      time: currentTime
+    };
+
+    // 第一个 fetch 请求，发送到 /game/steal
+    fetch('/game/steal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(postData)
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to get energy：' + response.statusText);
+              }
+              return response.text();
+            })
+            .then(data => {
+              console.log("Successfully increased energy！");
+              alert("Energy increased by 10 points！");
+            })
+            .catch(error => {
+              console.error('Error harvesting energy：', error);
+              alert('Failed to add energy：' + error.message);
+            });
+
+    // 第二个 fetch 请求，发送到 /energy/steal
+    fetch('/energy/steal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user_name: username, date: currentTime, energy: 10 })
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to add energy from /energy：' + response.statusText);
+              }
+              return response.text();
+            })
+            .then(data => {
+              console.log("Successfully increased energy from /energy！");
+            })
+            .catch(error => {
+              console.error('Error increasing energy from /energy：', error);
+            });
+  }
+
+
+  function displaySystemMessage(message) {
+    var systemMessageElement = document.createElement('div');
+    systemMessageElement.classList.add('message');
+    var systemMessageContent = document.createElement('div');
+    systemMessageContent.classList.add('message-content');
+    systemMessageContent.textContent = message;
+    systemMessageElement.appendChild(systemMessageContent);
+    systemMessageBox.appendChild(systemMessageElement);
+    systemMessageBox.scrollTop = systemMessageBox.scrollHeight;
+  }
+
+  function joinConference() {
+    username = document.getElementById('username').value;
+    if (username === '') {
+      alert('Please enter your nickname before joining the conference.');
+      return; // 如果没有输入昵称，停止进一步操作
+    }
+    if (username === 'admin') {
+      document.getElementById('adminControls').style.display = 'block';
+    }
+    connect();
+    displaySystemMessage(username + ' joined the conference'); // Display system message for user joining conference
+  }
+
+
+  function leaveConference() {
+    hidePopup();
+    if (!isJoined) {
+      alert('Please join the conference first.');
+      return;
+    }
+    var oldUsername = username; // Store the old username
+    if (stompClient !== null) {
+      stompClient.send("/app/leave", {}, oldUsername); // Use the old username to send leave message
+      stompClient.disconnect();
+    }
+    participantsList.innerHTML = ''; // 清空参与者列表
+
+    console.log('You left the conference');
+    displaySystemMessage(oldUsername + ' left the conference'); // Display system message for user leaving conference
+  }
+
+
+  function endCall() {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+    }
+    if (stompClient !== null) {
+      stompClient.disconnect();
+    }
+    console.log('Call ended');
+  }
+
+  window.addEventListener('beforeunload', function() {
+    endCall();
+  });
+</script>
+</body>
+</html>

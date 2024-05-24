@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <link rel="stylesheet" href="css/meeting.css">
+    <style>
+        .farm {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('img/Farm_Back.jpg');
+            background-size: 100% 100%;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .plant1 {
+            position: absolute;
+            top: 39%;
+            left:33%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .plant2 {
+            position: absolute;
+            top: 46%;
+            left:23.5%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .plant3 {
+            position: absolute;
+            top: 52%;
+            left:14%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .plant4 {
+            position: absolute;
+            top: 46%;
+            left:42.5%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .plant5 {
+            position: absolute;
+            top: 52%;
+            left:33%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .plant6 {
+            position: absolute;
+            top: 60%;
+            left:23.5%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .plant7 {
+            position: absolute;
+            top: 53%;
+            left:52%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .plant8 {
+            position: absolute;
+            top: 59%;
+            left:42.5%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .plant9 {
+            position: absolute;
+            top: 65%;
+            left:33%;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .plant:hover {
+            transform: scale(1.1);
+        }
+
+        .guide_image{
+            position: absolute;
+            top:60%;
+            left:65%;
+            width:400px;
+            height:280px;
+            opacity: 0.8;
+
+        }
+
+        .vegetable-img {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+
+        }
+
+        .seed {
+            position: absolute;
+            width: 150px;
+            height: 115px;
+            margin: 5px;
+            overflow: hidden;
+            cursor: pointer;
+
+            transition: transform 0.3s;
+        }
+
+        .countdown {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: red;
+            font-weight: bold;
+            z-index: 999;
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+
+<nav class="navigation">
+    <a href="index.html">Home</a>
+    <a href="notice.html">Introduction</a>
+    <a href="user.html">Contacts</a>
+    <a href="message.html">Message</a>
+    <a href="chooseMeeting.html">Meeting</a>
+    <a href="creatMeeting.html">ManageMeeting</a>
+    <a href="tree.html">Tree</a>
+    <a href="ranking.html">Ranking</a>
+
+</nav>
+<div class="farm">
+    <div class="plant plant1" onclick="confirmPlant(this)"></div>
+    <div class="plant plant2" onclick="confirmPlant(this)"></div>
+    <div class="plant plant3" onclick="confirmPlant(this)"></div>
+    <div class="plant plant4" onclick="confirmPlant(this)"></div>
+    <div class="plant plant5" onclick="confirmPlant(this)"></div>
+    <div class="plant plant6" onclick="confirmPlant(this)"></div>
+    <div class="plant plant7" onclick="confirmPlant(this)"></div>
+    <div class="plant plant8" onclick="confirmPlant(this)"></div>
+    <div class="plant plant9" onclick="confirmPlant(this)"></div>
+
+</div>
+
+<img class="guide_image" src="img/farmboard.png" alt="guide image" width="200">
+
+
+<script>
+
+    window.onload = function() {checkAndRestorePlantingState();};
+
+    let plantingState = {};
+
+    function checkAndRestorePlantingState() {
+        const currentUser = getLoggedInUser();
+        const storedUser = sessionStorage.getItem('currentUser');
+
+        if (storedUser && storedUser !== currentUser) {
+            // Clear the planting state if a different user logs in
+            sessionStorage.removeItem(`plantingState_${storedUser}`);
+            plantingState = {};
+        }
+
+        sessionStorage.setItem('currentUser', currentUser);
+        restorePlantingState();
+    }
+
+    function storePlantingState() {
+        const currentUser = getLoggedInUser();
+        if (currentUser) {
+            sessionStorage.setItem(`plantingState_${currentUser}`, JSON.stringify(plantingState));
+        }
+    }
+    function restorePlantingState() {
+        const currentUser = getLoggedInUser();
+        if (currentUser) {
+            const storedState = sessionStorage.getItem(`plantingState_${currentUser}`);
+            if (storedState) {
+                plantingState = JSON.parse(storedState);
+                Object.keys(plantingState).forEach(key => {
+                    if (plantingState[key]) {
+                        const plot = document.querySelector('.' + key);
+                        if (plot) {
+                            plantSeed(plot, false);  // Restore plant without user confirmation
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    function getLoggedInUser() {
+        return sessionStorage.getItem('username');
+    }
+    function confirmPlant(element) {
+        if (plantingState[element.classList[1]] === true){
+            alert("still growing, please wait")
+        }
+        else if(plantingState[element.classList[2]] === true){
+        }
+        else
+        {const confirmMessage = "Do you want to plant a seed here?";
+            if (confirm(confirmMessage)) {
+                // If user confirms, call plantSeed function
+                plantSeed(element);
+            }
+        }
+    }
+
+    function plantSeed(element) {
+        const seedImage = document.createElement('img');
+        seedImage.src = 'img/seed1.png';
+        seedImage.alt = 'Seed';
+        seedImage.className = 'vegetable-img seed';
+        seedImage.onclick = function () {};
+        element.appendChild(seedImage);
+        element.classList.add('seed');
+        plantingState[element.classList[1]] = true;
+        storePlantingState();
+
+        // Add countdown timer element
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'countdown';
+        countdownElement.textContent = '10'; // Initial value
+        element.appendChild(countdownElement);
+
+        // Start timer to grow the seed
+        let remainingTime = 10; // Seconds
+        const countdownInterval = setInterval(() => {
+            remainingTime--;
+            countdownElement.textContent = remainingTime;
+            if (remainingTime <= 0) {
+                clearInterval(countdownInterval);
+                countdownElement.style.display = 'none'; // Hide countdown after seed grows
+            }
+        }, 1000); // Update every second
+
+
+        // Start timer to grow the seed
+        setTimeout(() => {
+            // Remove seed image
+            const seed = element.querySelector('.seed');
+            if (seed) {
+                seed.style.display = 'none';
+                // Show plant image
+                const plantImage = document.createElement('img');
+                plantImage.src = 'img/plant1.png'; // Change this to the appropriate plant image URL
+                plantImage.alt = 'Vegetable';
+                plantImage.className = 'vegetable-img plant';
+                element.appendChild(plantImage);
+                element.classList.add('plant');
+                // Enable click event on plant image
+                plantImage.onclick = function () {
+                    plantingState[element.classList[1]] = false;
+                    plantingState[element.classList[2]] = true;
+                    storePlantingState();
+                    if (element.classList.contains('plant')) {
+                        // If the seed has grown into a plant, directly execute the steal function
+                        steal(element);
+                    }
+                    plantImage.style.display = 'none'; // Hide plant image after clicking
+                    element.removeChild(plantImage); // Remove plant image
+                    // Remove seed element from DOM
+                    element.removeChild(seed);
+                    // Update planting state
+
+                };
+            }
+        }, 10000); // 10 seconds
+    }
+
+    function steal(element) {
+        var username = sessionStorage.getItem('username');
+        if (!username) {
+            console.error('cannot find the username in sessionStorage ');
+            alert('please login to get the energy');
+            return;
+        }
+
+        const currentTime = new Date().toISOString();
+
+        const postData = {
+            username: username,
+            time: currentTime
+        };
+        fetch('/game/steal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to harvest energy：' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const seed = element.querySelector('.seed');
+                if (seed) {
+                    element.removeChild(seed);
+
+                    plantingState[element.classList[1]] = false;
+                    plantingState[element.classList[2]] = false;
+                }
+                plantingState[element.classList[2]] = false;
+                storePlantingState();
+                console.log("Successfully harvested energy！");
+                alert("Energy increased by 10 points！");
+            })
+            .catch(error => {
+                console.error('Error harvesting energy：', error);
+                alert('Failed to add energy：' + error.message);
+            });
+    }
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Meeting</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+  <link rel="stylesheet" href="css/meeting.css">
+</head>
+
+<body>
+<header>
+  <h2 class="logo">    </h2>
+  <nav class="navigation">
+    <a href="index.html">Home</a>
+    <a href="notice.html">Introduction</a>
+    <a href="user.html">Contacts</a>
+    <a href="message.html">Message</a>
+    <a href="creatMeeting.html" id="manageMeetingLink">ManageMeeting</a>
+    <a href="farm.html">Farm</a>
+    <a href="tree.html">Tree</a>
+    <a href="ranking.html">Ranking</a>
+  </nav>
+</header>
+
+<section class="parallax">
+  <img src="img/hill1.png" id="hill1">
+  <img src="img/hill2.png" id="hill2">
+  <img src="img/hill3.png" id="hill3">
+  <img src="img/hill4.png" id="hill4">
+  <img src="img/hill5.png" id="hill5">
+  <img src="img/tree.png" id="tree">
+  <section class="meetings-container">
+    <div class="meeting-item"><h2>Video Meeting Details</h2></div>
+  </section>
+  <img src="img/leaf.png" id="leaf">
+  <img src="img/plant.png" id="plant">
+</section>
+
+<script>
+function redirectToMeeting() {
+    window.location.href = 'meeting.html';
+}
+
+
+
+function getMeetings() {
+    fetch('./meetings')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to retrieve meetings');
+            }
+            return response.json();
+        })
+        .then(meetings => {
+            console.log('Meetings:', meetings); // 添加这行日志
+            updateMeetingList(meetings);
+        })
+        .catch(error => {
+            console.error('Error fetching meetings:', error.message);
+        });
+}
+
+
+function updateMeetingList(meetings) {
+    var meetingsContainer = document.querySelector('.meetings-container');
+
+    meetings.forEach(function(meeting) {
+        var meetingItem = document.createElement('div');
+        meetingItem.classList.add('meeting-item');
+
+        var meetingDetails = document.createElement('div');
+        meetingDetails.classList.add('meeting-details');
+
+        appendMeetingDetail(meetingDetails, 'Meeting Date', meeting.date);
+        appendMeetingDetail(meetingDetails, 'Meeting Time', meeting.time);
+        appendMeetingDetail(meetingDetails, 'Meeting Topic', meeting.topic);
+        appendMeetingDetail(meetingDetails, 'Speaker', meeting.speaker);
+
+        meetingItem.appendChild(meetingDetails);
+
+        var enterButton = document.createElement('button');
+        enterButton.classList.add('enter-meeting');
+        enterButton.textContent = 'Enter Meeting';
+        enterButton.onclick = function() {
+            redirectToMeeting();
+        };
+
+        meetingItem.appendChild(enterButton);
+
+        meetingsContainer.appendChild(meetingItem);
+    });
+}
+
+function appendMeetingDetail(container, title, content) {
+    var detail = document.createElement('div');
+    var detailTitle = document.createElement('h3');
+    detailTitle.textContent = title;
+    var detailContent = document.createElement('p');
+    detailContent.textContent = content;
+    detail.appendChild(detailTitle);
+    detail.appendChild(detailContent);
+    container.appendChild(detail);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    getMeetings();
+});
+</script>
+
+<script src="js/script.js"></script>
+</body>
+</html>

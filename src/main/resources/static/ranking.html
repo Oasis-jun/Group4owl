@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Ranking</title>
+
+    <style>
+
+        .navigation {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .echartsBox {
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            opacity: 0.8;
+        }
+        .echarts {
+            width: 800px;
+            height: 500px;
+
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        #leaderboard {
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            text-align: center;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user:last-child {
+            border-bottom: none;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .user-info span {
+            font-weight: bold;
+        }
+
+        .energy-bar {
+            height: 20px;
+            border-radius: 10px;
+            background-color: #e3e3e3;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            height: 100%;
+            background-color: #28a745;
+        }
+        .parallax {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .parallax img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<nav class="navigation">
+    <a href="index.html">Home</a>
+    <a href="notice.html">Introduction</a>
+    <a href="user.html">Contacts</a>
+    <a href="message.html">Message</a>
+    <a href="chooseMeeting.html">Meeting</a>
+    <a href="creatMeeting.html">ManageMeeting</a>
+    <a href="farm.html">Farm</a>
+    <a href="tree.html">Tree</a>
+
+
+</nav>
+<section class="parallax">
+    <img src="img/hill1.png" id="hill1">
+    <img src="img/hill2.png" id="hill2">
+    <img src="img/hill3.png" id="hill3">
+    <img src="img/hill4.png" id="hill4">
+    <img src="img/hill5.png" id="hill5">
+    <img src="img/tree.png" id="tree">
+    <img src="img/leaf.png" id="leaf">
+    <img src="img/plant.png" id="plant">
+</section>
+
+
+    <h1>Leaderboard</h1>
+
+    <div id="leaderboard"></div>
+
+    <div class="echartsBox">
+        <div class="echarts" id="main"></div>
+    </div>
+
+<script src="/js/echarts.min.js"></script>
+
+<script>
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function fetchLeaderboard() {
+        fetch('/game/leaderboard')
+            .then(response => response.json())
+            .then(users => {
+                const leaderboardElement = document.getElementById('leaderboard');
+                // Clear existing leaderboard entries
+                leaderboardElement.innerHTML = '';
+                // Add new leaderboard entries
+                users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.className = 'user';
+                    const avatarColor = getRandomColor();
+                    userElement.innerHTML = `
+                        <div class="user-info">
+                            <div class="avatar" style="background-color: ${avatarColor};">
+                                ${user.user_name.charAt(0).toUpperCase()}
+                            </div>
+                            <span>${user.user_name}</span>
+                        </div>
+                        <div class="energy-bar">
+                            <div class="energy-fill" style="width: ${user.energy}%"></div>
+                        </div>
+                        <span>${user.energy}</span>
+                    `;
+                    leaderboardElement.appendChild(userElement);
+                });
+
+                const userNameList = users.map(user => user.user_name);
+                const energyList = users.map(user => user.energy);
+
+                // Prepare data for the chart
+                const mydata = users.map(user => ({ value: user.energy, name: user.user_name }));
+
+                // Initialize echarts instance
+                const myChart = echarts.init(document.getElementById('main'));
+
+                // Chart configuration
+                const option = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User Energy Value',
+                        left: 'center',
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['Energy value'],
+                        left: 'right',
+                        bottom: 'center'
+                    },
+                    xAxis: {
+                        data: userNameList
+                    },
+                    yAxis: {},
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'bar',
+                            data: energyList
+                        },
+                        {
+                            name: 'Energy value',
+                            type: 'line',
+                            data: energyList
+                        }
+                    ]
+                };
+
+                // Display the chart
+                myChart.setOption(option);
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+    }
+
+    // Load the leaderboard and chart when the page loads
+    window.onload = fetchLeaderboard;
+</script>
+
+</body>
+</html>

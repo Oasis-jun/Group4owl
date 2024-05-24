@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Message</title>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <script src="js/chechLogin.js"></script>
+    <script src="js/userInfoBar.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/pager.js"></script>
+    <link rel="stylesheet" href="css/page.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <link rel="stylesheet" href="/css/layui.css">
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button {
+            padding: 6px 12px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .parallax {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .parallax img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+        .logo img {
+            position: absolute;
+            margin: 10px 10px -100px 50px;
+            top: 0;
+            left: 0;
+            width: 50px;
+            pointer-events: none;
+        }
+        .mainLeft{
+            background-color: #54AEB1 ;
+        }
+        .mainRight{
+            background-color: #BEE6EE ;
+        }
+        .navigation{
+            /*background-color:#BEE6EE;*/
+            padding: 10px;
+            margin: 1px 1px 1px 1px;
+            border-radius: 5px;
+            /*opacity: 0.9*/
+        }
+        /*.navigation a{*/
+        /*    color: #2f363c;*/
+        /*}*/
+        header{
+            margin: 1px ;
+            padding:  50px 20px 20px 20px;
+        }
+
+    </style>
+    <style>
+        #detailDialog {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            height: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .toolButtonRow {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        #detail_close {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #detail_close:hover {
+            background-color: #0056b3;
+        }
+
+        .formItem {
+            margin-bottom: 10px;
+        }
+
+        .formItemLabel {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #detail_senderUserName {
+            color: #333;
+            font-weight: bold;
+        }
+
+        #detail_sendTime {
+            color: #666;
+        }
+
+        #detail_title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #detail_content {
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<section class="parallax">
+    <img src="img/hill1.png" id="hill1">
+    <img src="img/hill2.png" id="hill2">
+    <img src="img/hill3.png" id="hill3">
+    <img src="img/hill4.png" id="hill4">
+    <img src="img/hill5.png" id="hill5">
+    <img src="img/tree.png" id="tree">
+    <img src="img/leaf.png" id="leaf">
+    <img src="img/plant.png" id="plant">
+</section>
+
+<section class="logo">
+    <a href="index.html">
+        <img src="img/logo.png" id="logo" alt="Logo">
+    </a>
+</section>
+<header>
+
+    <h2 class="logo">    </h2>
+    <nav class="navigation">
+        <a href="index.html">Home</a>
+        <a href="notice.html">Introduction</a>
+
+        <a href="chooseMeeting.html">Meeting</a>
+        <a href="creatMeeting.html">ManageMeeting</a>
+        <a href="farm.html">Farm</a>
+        <a href="tree.html">Tree</a>
+        <a href="ranking.html">Ranking</a>
+
+    </nav>
+</header>
+
+<div class="container" style="margin: 100px 0 ">
+
+    <div class="main">
+        <div class="mainLeft">
+            <div class="menuItem" value="user">Contacts</div>
+            <div class="menuItem" value="message">Message</div>
+        </div>
+        <div class="mainRight">
+            <div id="listDiv">
+                <div class="toolButtonRow">
+                    <div>
+                        <button id="open">Send</button>
+                        <button id="refreshBtn">Refresh</button>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="tableContainer">
+                        <table cellspacing="0">
+                            <thead>
+                            <tr style="background-color: #f4f4f4;font-weight: bold;color: #333;text-transform: uppercase;">
+                                <td>Title</td>
+                                <td>Sender</td>
+                                <td>Time</td>
+                                <td>receiverNames</td>
+                                <td>Operation</td>
+                            </tr>
+                            </thead>
+                            <tbody id="messagesContainer">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagerContainer">
+                        <div class="prePageBtn pagerBtn pagerItem">previous</div>
+                        <div class="pagerItem" style="display: flex;">
+                            <div class="curPageNum">1</div>
+                            <div>/</div>
+                            <div class="totalPageNum">1</div>
+                        </div>
+                        <div class="nextPageBtn pagerBtn pagerItem">next</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="popup" style="display:none;">
+                <div class="toolButtonRow">
+                    <button id="send">Send</button>
+                    <button id="close">Back</button>
+                </div>
+                <div>
+                    <div>
+
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Send to</div>
+                            <div style="display: flex;">
+                                <div id="divReceivers" style=" width: 300px;
+        padding: 10px;
+      background-color: white;
+        border: 1px solid #ccc; /* 添加边框 */
+        border-radius: 5px; /* 添加圆角 */
+        outline: none; /* 移除默认轮廓样式 */ "></div>
+                                <button onclick="handleSelectReceivers()">Choose</button>
+                            </div>
+                        </div>
+                        <div class="formItem" style="margin: 30px;">
+                            <div class="formItemLabel">Title</div>
+                            <div><input type="text" id="title" style=" width: 200%;
+        padding: 10px;
+        border: 1px solid #ccc; /* 添加边框 */
+        border-radius: 5px; /* 添加圆角 */
+        outline: none; /* 移除默认轮廓样式 */ "></div>
+                        </div>
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Content</div>
+                            <br>
+                            <div><textarea rows="99" id="content" style=" width: 800px;
+        height: 300px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 16px;
+        resize: none; /* 禁止调整大小 */"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="multiSelectDivId" style="display: none;position:absolute;border:1px solid;padding:10px; background:white;">
+                <div id="divUserCheckBoxList"></div>
+                <div style="margin-top: 10px;">
+                    <button onclick="selectUsers()">confirm</button>
+                    <button onclick="closeSelectUserDialog()">cancel</button>
+                </div>
+            </div>
+
+            <div id="detailDialog" style="display:none;">
+                <div class="toolButtonRow">
+                    <button id="detail_close">Back</button>
+                </div>
+                <div>
+                    <div>
+
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Sender</div>
+                            <div id="detail_senderUserName"style=" width: 800px;
+height: 50px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;"></div>
+                        </div>
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Time</div>
+                            <div id="detail_sendTime"style=" width: 800px;
+height: 50px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;"></div>
+                        </div>
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Title</div>
+                            <div id="detail_title"style=" width: 800px;
+height: 50px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;"></div>
+                        </div>
+
+                        <div class="formItem"style="margin: 30px;">
+                            <div class="formItemLabel">Content</div>
+                            <br>
+                            <div id="detail_content" style=" width: 800px;
+        height: 300px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<template id="messageRowTemplate" style="display: none;">
+    <tr >
+        <td>##title##</td>
+        <td>##senderUserName##</td>
+        <td>##sendTime##</td>
+        <td>##receiverName##</td>
+        <td>
+            <button onclick="openDetail(##id##)">Detail</button>
+        </td>
+    </tr>
+</template>
+
+</body>
+
+<script>
+    function load() {
+        getPage(1);
+    }
+
+    function getPage(pageNum) {
+        let messagesContainer = $('#messagesContainer');
+        messagesContainer.html("");
+
+        let params = new URLSearchParams();
+        params.append('userId', sessionStorage.getItem('userId'));
+        params.append('current', pageNum);
+        let pageSize = 10;
+        params.append('size', pageSize);
+
+
+        fetch(`/message/getMessages?${params.toString()}`)
+            .then(response => response.json())
+            .then(rs => {
+                // 修改总页数
+                const total = rs.data.total;
+                let totalPage = Math.floor(total / pageSize);
+                if (total % pageSize > 0) {
+                    totalPage++;
+                }
+                onSearchSuc(totalPage);
+
+                const messages = rs.data.list;
+                let templateHtml = $("#messageRowTemplate").html();
+
+                for (let i = 0; i < messages.length; i++) {
+                    let message = messages[i];
+                    let rowHtml = templateHtml
+                        .replace('##title##', message.title)
+                        .replace('##senderUserName##', message.senderUserName)
+                        .replace('##sendTime##', message.sendTime)
+                        .replace('##receiverName##', message.receiverName)
+                        .replace('##id##', message.id);
+                    messagesContainer.append(rowHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function refresh() {
+        load();
+    }
+
+    function loadOtherUsers() {
+        let params = new URLSearchParams();
+        params.append('userId', sessionStorage.getItem('userId'));
+        params.append('current', 1);
+        params.append('size', 10000);
+
+        // 发送GET请求
+        fetch(`/user/getOtherUsers?${params.toString()}`)
+            .then(response => response.json())
+            .then(rs => {
+                const users = rs.data.list;
+                // let usersContainer = $('#receiverId');
+                // for (let i = 0; i < users.length; i++) {
+                //     let user = users[i];
+                //     usersContainer.append("<option value=\"" + user.id + "\">" + user.user_name + "</option>");
+                // }
+                const usersContainer = $("#divUserCheckBoxList");
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i];
+                    usersContainer.append("<label style='margin: 3px;'><input name='chkUser' type='checkbox' value='" + user.id + "' userName='" + user.user_name + "'></input>" + user.user_name + "</label>");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    let receiverIds = [];
+    let receiverNames = [];
+    function handleSelectReceivers(){
+        resetSelecttor();
+
+        // 假设复选框的name为"myCheckboxes"
+        var selectedCheckboxes = $('input[name="chkUser"]');
+        // 遍历选中的复选框
+        selectedCheckboxes.each(function() {
+            const val = $(this).val();
+            if (receiverIds.indexOf(val) >= 0){
+                $(this).prop('checked', true);
+            }
+        });
+
+        const rsDiv = $("#divReceivers");
+        const downDiv = $("#multiSelectDivId");
+        let left = rsDiv.position().left;
+        let top = rsDiv.position().top + rsDiv.height() + 5;
+        downDiv.css({
+            'left': left + 'px', // 设置left值
+            'top': top + 'px'  // 设置top值
+        });
+        downDiv.show();
+    }
+
+
+
+    function selectUsers(){
+        receiverIds = [];
+        receiverNames = [];
+        // 假设复选框的name为"myCheckboxes"
+        var selectedCheckboxes = $('input[name="chkUser"]:checked');
+
+        // 遍历选中的复选框
+        selectedCheckboxes.each(function() {
+            console.log($(this).val(), $(this).attr("userName")); // 输出每个选中复选框的值
+            receiverIds.push($(this).val());
+            receiverNames.push($(this).attr("userName"));
+        });
+        const receiverNamesStr = receiverNames.join('，');
+
+        const rsDiv = $("#divReceivers");
+        rsDiv.html(receiverNamesStr);
+
+        closeSelectUserDialog();
+    }
+
+    function closeSelectUserDialog(){
+        $("#multiSelectDivId").hide();
+        resetSelecttor();
+    }
+
+    function resetSelecttor(){
+        // 假设复选框的name为"myCheckboxes"
+        var selectedCheckboxes = $('input[name="chkUser"]:checked');
+
+        // 遍历选中的复选框
+        selectedCheckboxes.each(function() {
+            $(this).prop('checked', false);
+        });
+    }
+
+    function send(callback) {
+        let message = {
+            senderId: sessionStorage.getItem('userId'),
+            receiverId: receiverIds.join(','),
+            receiverName: receiverNames.join(','),
+            title: $("#title").val(),
+            content: $("#content").val()
+        };
+        // 发送GET请求
+        fetch('/message/createMessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        })
+            .then(response => response.json())
+            .then(rs => {
+                callback();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function openDetail(messageId) {
+        let params = new URLSearchParams();
+        params.append('id', messageId);
+
+        // 发送GET请求
+        fetch(`/message/getMessageById?${params.toString()}`)
+            .then(response => response.json())
+            .then(rs => {
+                const message = rs.data;
+                $("#detail_senderUserName").text(message.senderUserName);
+                $("#detail_sendTime").text(message.sendTime);
+                $("#detail_title").text(message.title);
+                $("#detail_content").text(message.content);
+
+                $('#listDiv').hide();
+                $('#detailDialog').show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    const curPageName = "message";
+    $(document).ready(function () {
+        chechLogin();
+        initUserInfoBar();
+        initPager(getPage);
+        load();
+        loadOtherUsers();
+
+        $('.menuItem[value="message"]').addClass("menuItemActive");
+
+        $('.menuItem').click(function () {
+            var items = $('.menuItem');
+            var that = $(this);
+            onMenuItemClick(items, that)
+        });
+
+        $('#refreshBtn').click(function () {
+            refresh();
+        });
+
+        $('#send').click(function () {
+            send(function () {
+                $('#listDiv').show();
+                $('#popup').hide();
+            });
+        });
+
+        $('#open').click(function () {
+            $('#listDiv').hide();
+            $('#popup').show();
+            receiverIds = [];
+            receiverNames = [];
+        });
+
+        $('#close').click(function () {
+            $('#listDiv').show();
+            $('#popup').hide();
+        });
+
+        $('#detail_close').click(function () {
+            $('#listDiv').show();
+            $('#detailDialog').hide();
+        });
+
+
+    });
+</script>
+</html>

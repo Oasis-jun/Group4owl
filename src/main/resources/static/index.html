@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <style>
+        .echartsBox {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .echarts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        .echarts {
+            width: 400px;
+            height: 400px;
+        }
+        .description {
+            text-align: center;
+            margin-top: 10px;
+            color: #d3d3d3; /* 浅色字体 */
+        }
+
+    </style>
+</head>
+
+<body>
+<header>
+    <h2 class="logo">    </h2>
+    <nav class="navigation">
+        <a href="notice.html">Introduction</a>
+        <a href="user.html">Contacts</a>
+        <a href="message.html">Message</a>
+        <a href="chooseMeeting.html">Meeting</a>
+        <a href="creatMeeting.html" id="manageMeetingLink">ManageMeeting</a>
+
+        <a href="farm.html">Farm</a>
+
+        <a href="ranking.html">Ranking</a>
+        <a href="tree.html">Tree</a>
+        <br>
+        <a href="logins.html" id="12">Login</a>
+        <a href="../../../../../register.html" id="13">Register</a>
+        <a href="#" id="usernameDisplay1" style="background: #f9f9f9"></a>
+        <a href="#" id="usernameDisplay" style="background: #f9f9f9"></a>
+        <button type="button" id="14" onclick="remove()" class="button">Log out</button>
+    </nav>
+</header>
+
+<section class="parallax">
+    <img src="img/hill1.png" id="hill1">
+    <img src="img/hill2.png" id="hill2">
+    <img src="img/hill3.png" id="hill3">
+    <img src="img/hill4.png" id="hill4">
+    <img src="img/hill5.png" id="hill5">
+    <img src="img/tree.png" id="tree">
+    <img src="img/leaf.png" id="leaf">
+
+    <h2 id="text" style="text-align: center;">
+        Energy-Saving Office Platform
+        <br>
+
+        <span style="font-size: 0.4em;">- designed for neighborhood committee -</span>
+        <br>
+
+        <span style="font-size: 0.25em; color: darkslategray;">Slide down to see green energy data</span>
+    </h2>
+
+    <img src="img/plant.png" id="plant">
+
+</section>
+
+<section class="sec">
+
+    <h2 style="text-align: center;">
+        Green Energy Data
+        <br>
+        <span style="font-size: 0.4em; color: darkgreen;"> The chart below shows the green energy of staffs
+            <br>To accumulate green energy is to contribute to sustainability</span>
+    </h2>
+
+    <div class="echartsBox">
+        <div class="echarts-container">
+            <div class="echarts" id="main2"></div>
+            <div class="description">Total User Energy Value (Bar Chart)</div>
+        </div>
+        <div class="echarts-container">
+            <div class="echarts" id="main3"></div>
+            <div class="description">Total User Energy Value (Pie Chart)</div>
+        </div>
+    </div>
+    <div class="echartsBox">
+        <div class="echarts-container">
+            <div class="echarts" id="main"></div>
+            <div class="description">Energy Value Over Time (All Users)</div>
+        </div>
+        <div class="echarts-container">
+            <div class="echarts" id="userChart"></div>
+            <div class="description">Energy Value Over Time (Current User)</div>
+        </div>
+    </div>
+</section>
+
+<script src="/js/echarts.min.js"></script>
+
+<script type="text/javascript">
+    function getUsersEnergyByDate() {
+        fetch('/energy/getUsersEnergyByDate')
+            .then(response => response.json())
+            .then(energy => {
+                let userNameSet = new Set();
+                let dateSet = new Set();
+                let userNameList = [];
+                let dateList = [];
+
+                energy.forEach((item) => {
+                    userNameSet.add(item.user_name);
+                    dateSet.add(item.date);
+                });
+
+                userNameList = Array.from(userNameSet);
+                dateList = Array.from(dateSet);
+
+                let mydata = [];
+                for (let i = 0; i < userNameList.length; i++) {
+                    let list = [];
+                    energy.forEach((item) => {
+                        if (item.user_name === userNameList[i]) {
+                            list.push([item.date, item.energy]);
+                        }
+                    });
+                    mydata.push({
+                        data: list,
+                        name: userNameList[i],
+                        type: 'line'
+                    });
+                }
+
+                let myChart = echarts.init(document.getElementById('main'));
+                let option = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        data: dateList
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: mydata
+                };
+                myChart.setOption(option);
+
+                let currentUsername = sessionStorage.getItem('username');
+                let userData = energy.filter(item => item.user_name === currentUsername).map(item => [item.date, item.energy]);
+                let userChart = echarts.init(document.getElementById('userChart'));
+                let userOption = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: currentUsername + ' Energy Value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        data: dateList
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        data: userData,
+                        name: currentUsername,
+                        type: 'line'
+                    }]
+                };
+                userChart.setOption(userOption);
+
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+    }
+
+    function getUsersEnergySum() {
+        fetch('/energy/getUsersEnergySum')
+            .then(response => response.json())
+            .then(energy => {
+                let userNameList = energy.map((item) => item.user_name);
+                let energyList = energy.map((item) => item.energy);
+
+                var mydata = [];
+                for (var i = 0; i < energy.length; i++) {
+                    mydata[i] = { value: energy[i].energy, name: energy[i].user_name };
+                }
+
+                var myChart2 = echarts.init(document.getElementById('main2'));
+                var option2 = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['Energy value'],
+                        left: "right",
+                        bottom: "center"
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    },
+                    yAxis: {
+                        inverse: true,
+                        type: 'category',
+                        data: userNameList
+                    },
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'bar',
+                            data: energyList
+                        },
+                    ],
+                };
+                myChart2.setOption(option2);
+
+                var myChart3 = echarts.init(document.getElementById('main3'));
+                var option3 = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        data: ['Energy value'],
+                        left: "right",
+                        top: "70%",
+                    },
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'pie',
+                            radius: '50%',
+                            data: mydata,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart3.setOption(option3);
+
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+    }
+
+    window.onload = function () {
+        getUsersEnergyByDate();
+        getUsersEnergySum();
+
+        var userType = sessionStorage.getItem('user_type');
+        if (userType === 'Employee_test') {
+            document.getElementById('manageMeetingLink').style.display = 'none';
+        }
+
+        var username = sessionStorage.getItem('username');
+        if (username != null) {
+            document.getElementById("12").style.visibility = "hidden";
+            document.getElementById("13").style.visibility = "hidden";
+            document.getElementById("14").style.visibility = "visible";
+            document.getElementById("usernameDisplay").style.visibility = "visible";
+            document.getElementById("usernameDisplay1").style.visibility = "visible";
+            document.getElementById('usernameDisplay').textContent = username;
+            document.getElementById('usernameDisplay1').textContent = userType;
+        } else {
+            document.getElementById("12").style.visibility = "visible";
+            document.getElementById("13").style.visibility = "visible";
+            document.getElementById("14").style.visibility = "hidden";
+            document.getElementById("usernameDisplay").style.visibility = "hidden";
+            document.getElementById("usernameDisplay1").style.visibility = "hidden";
+            window.location.href = "logins.html";
+        }
+    };
+
+    function remove() {
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('user_type');
+        window.location.href = "logins.html";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+
+    <meta charset="UTF-8">
+    <title>Introduction</title>
+
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <link rel="stylesheet" href="/css/layui.css">
+    <script src="/js/layui.js"></script>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .notice-container {
+
+            width: 110%;
+            margin: 10%;
+
+            font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+            border-radius: 5px;
+        }
+
+
+        .layui-nav .layui-nav-item a {
+            color: black;
+            height: 60px;
+            line-height: 60px;
+            border-bottom: 1px solid #F0EFEF;
+            cursor: pointer;
+            border-radius: 5px;
+            opacity: 0.7;
+            backdrop-filter: blur(10px); /* 应用毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px); /* 为兼容性添加前缀 */
+        }
+
+        .layui-nav .layui-nav-item a:hover{
+            color: black;
+        }
+
+        .item-list {
+            height: calc(100vh - 115px);
+            overflow-y: auto;
+        }
+
+        .detail-item {
+            padding: 10px;
+            background-color: #CDEACF;
+            border-radius: 5px;
+            opacity: 0.7;
+            backdrop-filter: blur(10px); /* 应用毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px); /* 为兼容性添加前缀 */
+        }
+        .member {
+            display:flex ;
+        }
+        .detail-title {
+            margin: 5px 0 5px 0;
+        }
+
+        .detail-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #5F5F5F;
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+        .detail-all-click {
+            color: #01AAED;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-content {
+
+        }
+
+        .scroller::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .scroller::-webkit-scrollbar-track {
+            background-color: transparent;
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius: 2em;
+        }
+
+        .scroller::-webkit-scrollbar-thumb {
+            background-color: rgb(147, 147, 153, 0.5);
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius: 2em;
+        }
+
+
+        #noticeDialog {
+            width: 500px;
+            height: 400px;
+            background-color: #fff;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #D9D9D9;
+            border-radius: 5px;
+        }
+        .parallax {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .parallax img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+        .avatar {
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .detail-title h3 {
+            display: flex;
+        }
+
+        .logo img {
+            position: absolute;
+            margin: 10px 10px -100px 50px;
+            top: 0;
+            left: 0;
+            width: 50px;
+            pointer-events: none;
+        }
+        .navigation{
+            /*background-color:#BEE6EE;*/
+            padding: 10px;
+            margin: 1px 1px 1px 1px;
+            border-radius: 5px;
+            /*opacity: 0.9*/
+        }
+
+        /*.navigation a{*/
+        /*    color: #2f363c;*/
+        /*}*/
+
+    </style>
+    <style>
+        .detail-content {
+            display: none;
+        }
+        .member {
+            margin: 20px 0;
+        }
+    </style>
+    <script>
+        function openDialog(element) {
+            const detailContent = element.parentElement.previousElementSibling;
+            if (detailContent.style.display === "none" || detailContent.style.display === "") {
+                detailContent.style.display = "block";
+                element.textContent = "Hide";
+            } else {
+                detailContent.style.display = "none";
+                element.textContent = "View al";
+            }
+        }
+    </script>
+</head>
+
+<header>
+    <h2 class="logo">    </h2>
+    <nav class="navigation">
+        <a href="index.html">Home</a>
+        <a href="user.html">Contacts</a>
+        <a href="message.html">Message</a>
+        <a href="chooseMeeting.html">Meeting</a>
+        <a href="creatMeeting.html">ManageMeeting</a>
+        <a href="farm.html">Farm</a>
+        <a href="tree.html">Tree</a>
+        <a href="ranking.html">Ranking</a>
+
+    </nav>
+</header>
+
+<body>
+<section class="parallax">
+    <img src="img/hill1.png" id="hill1">
+    <img src="img/hill2.png" id="hill2">
+    <img src="img/hill3.png" id="hill3">
+    <img src="img/hill4.png" id="hill4">
+    <img src="img/hill5.png" id="hill5">
+    <img src="img/tree.png" id="tree">
+    <img src="img/leaf.png" id="leaf">
+    <img src="img/plant.png" id="plant">
+</section>
+
+<section class="logo">
+    <a href="index.html">
+        <img src="img/logo.png" id="logo" alt="Logo">
+    </a>
+</section>
+
+<div class="notice-container">
+    <div class="layui-row">
+        <div class="layui-col-xs9">
+            <div class="detial-container">
+                <div class="detail-list" id="notice" >
+                    <div style="height: 60px;line-height: 60px;margin-left:10px;border-bottom: 1px solid #F0EFEF">
+                        <h2>Web Introduction - Team-Owl-Info</h2>
+                    </div>
+                    <div class="item-list scroller">
+                        <div class="detail-item">
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #00FFFF">W</span>
+                                <span class="detail-title">
+                                    <h3>Web Overview</h3>
+                                </span>
+                            </div>
+
+                            <div class="detail-content" style="margin: 10px 40px">
+                                <p>
+                                    This project aims to reduce the carbon emissions of local community daily operations by promoting sustainable practices. The platform primarily addresses issues related to transportation, paper consumption, and traditional meeting methods. Core features include email, online chat, farm game, tree growth, and green energy, all designed to create an environmentally friendly work environment.
+                                </p>
+                            </div>
+                            <div class="detail-all-click" style="margin: 10px">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #00FFFF">W</span>
+                                <span class="detail-title">
+                                    <h3>Zehui Wang 21207287</h3>
+                                </span>
+
+                            </div>
+
+                            <div class="detail-content" style="margin: 10px 40px">
+                                <p>
+                                    Wang Zehui, as a senior front-end developer, focuses on HTML CSS and JavaScript. He is not only a coding expert, but also an expert in user interface design and user experience optimization. Wang has the ability to transform complex design concepts into intuitive and user-friendly web interfaces. He pays attention to details, and every pixel adjustment reflects his pursuit of perfection. He has also accumulated rich experience in cross browser compatibility, ensuring that our website runs smoothly on various browsers.
+                                </p>
+                            </div>
+
+                            <div class="detail-all-click" style="margin: 10px">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+
+
+
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #1e9fff">Z</span>
+                                <span class="detail-title">
+                                    <h3>Weilun Zhou 21207289</h3>
+                                </span>
+
+                            </div>
+                            <div class="detail-content">
+                                <p>
+                                    Zhou Weilun took on the role of project management in the team. He, who is proficient in using React and Vue frameworks, not only has solid technical skills, but also outstanding performance in project coordination and team collaboration. Zhou has rich experience in project management and is able to allocate tasks reasonably, track project progress, and ensure that each stage is progressing according to plan. He has strong communication skills and can effectively solve various problems within the team, making him an indispensable core member of the team.
+                                </p>
+                            </div>
+                            <div class="detail-all-click" style="margin: 10px">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #9aff1e">L</span>
+                                <span class="detail-title">
+                                    <h3>Xijing Lin 21207292</h3>
+                                </span>
+
+                            </div>
+                            <div class="detail-content">
+                                <p>
+                                    Lin Xijing is a front-end engineer specializing in mobile development. he is proficient in responsive design and cross platform development techniques, ensuring that our website performs well on different devices and screen sizes. Lin's design philosophy is user centered and can adjust the interface layout and functions according to user needs. He constantly learns and adopts the latest technologies and tools to enhance the competitiveness of our products.
+                                </p>
+                            </div>
+
+                            <div class="detail-all-click">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #ff1eca">L</span>
+                                <span class="detail-title">
+                                    <h3>Jiajun Li 21207296</h3>
+                                </span>
+
+                            </div>
+                            <div class="detail-content">
+                                <p>
+                                    Li Jiajun is a performance optimization expert in the team. He has in-depth research on front-end performance optimization and debugging, and can quickly identify and solve problems that affect webpage loading speed and performance. Li is familiar with various front-end tools and frameworks, proficient in solving high complexity technical problems, optimizing code structure, and improving website response speed. His work enables our website to provide a smooth and efficient experience for users when accessing.
+                                </p>
+                            </div>
+
+                            <div class="detail-all-click">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #ff1e1e">Z</span>
+                                <span class="detail-title">
+                                    <h3>Jingyu Zhang 21207424</h3>
+                                </span>
+
+                            </div>
+
+                            <div class="detail-content">
+                                <p>
+                                    Zhang Jingyu is a highly creative designer and developer. He has a dual background in art and programming, and is able to design web pages that are both beautiful and practical. Zhang excels in using CSS preprocessors and animation production, giving our website a unique visual effect and dynamic experience. She focuses on the visual experience of users and is committed to perfectly combining design aesthetics with functionality, making our website not only visually appealing but also user-friendly.
+                                </p>
+                            </div>
+
+                            <div class="detail-all-click">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+                            <div class="member">
+                                <span class="avatar" STYLE="background-color: #1e8fff">T</span>
+                                <span class="detail-title">
+                                    <h3>Puyin Tao 21207441</h3>
+                                </span>
+
+                            </div>
+                            <div class="detail-content">
+                                <p>
+                                    Tao Puying focuses on front-end security and data protection. He is proficient in security coding practices and front-end security tools, and can prevent and respond to various security threats. Tao has extensive experience in data protection, ensuring that user data is properly protected on our website. His work has built a solid security barrier for our website, ensuring the security of user information.
+                                </p>
+                            </div>
+
+                            <div class="detail-all-click">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                            </div>
+
+
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 10px;"></fieldset>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div id="chat" style="display: none">
+                    <div style="height: 60px;line-height: 60px;margin-left:10px;border-bottom: 1px solid #F0EFEF">
+                        <h2>message</h2>
+                    </div>
+                    <div style="padding: 10px">
+                        <form class="layui-form" action="#">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 100px">Sender：</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="title" lay-verify="title" autocomplete="off"
+                                           placeholder="please enter the sender" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">Content：</label>
+                                <div class="layui-input-block">
+                                    <textarea class="layui-textarea" name="content" lay-verify="content"
+                                              rows="8"></textarea></div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="layui-btn">Send</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">Reset</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="noticeDialog" style="display: none;padding: 10px">
+        <div style="text-align: center;">
+            <h3></h3>
+        </div>
+        <div style="padding: 10px">
+            <p id="content"></p>
+        </div>
+        <div style="width: 100%;margin-top: 65px;text-align: center">
+            <button  type="button" class="layui-btn" onclick="$('#noticeDialog').hide()">I KNOWN</button>
+        </div>
+    </div>
+</div>
+</body>
+
+
+</html>

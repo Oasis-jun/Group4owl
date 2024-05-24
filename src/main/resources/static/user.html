@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts</title>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <script src="js/chechLogin.js"></script>
+    <script src="js/userInfoBar.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/pager.js"></script>
+    <link rel="stylesheet" href="css/page.css">
+    <link rel="stylesheet" href="css/page.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <link rel="stylesheet" href="/css/layui.css">
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button {
+            padding: 6px 12px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logo img {
+            position: absolute;
+            margin: 10px 10px -100px 50px;
+            top: 0;
+            left: 0;
+            width: 50px;
+            pointer-events: none;
+        }
+        .mainLeft{
+            background-color: #54AEB1 ;
+        }
+        .mainRight{
+            background-color: #BEE6EE ;
+        }
+        .navigation{
+            /*background-color:#BEE6EE;*/
+            padding: 10px;
+            margin: 1px 1px 1px 1px;
+            border-radius: 5px;
+            /*opacity: 0.6*/
+        }
+        header{
+            margin: 1px ;
+            padding:  50px 20px 20px 20px;
+        }
+        /*.navigation a{*/
+        /*    color: #2f363c;*/
+        /*}*/
+        .parallax {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .parallax img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<section class="parallax">
+    <img src="img/hill1.png" id="hill1">
+    <img src="img/hill2.png" id="hill2">
+    <img src="img/hill3.png" id="hill3">
+    <img src="img/hill4.png" id="hill4">
+    <img src="img/hill5.png" id="hill5">
+    <img src="img/tree.png" id="tree">
+    <img src="img/leaf.png" id="leaf">
+    <img src="img/plant.png" id="plant">
+</section>
+
+<section class="logo">
+    <a href="index.html">
+        <img src="img/logo.png" id="logo" alt="Logo">
+    </a>
+</section>
+<header>
+
+    <h2 class="logo">    </h2>
+    <nav class="navigation">
+        <a href="index.html">Home</a>
+        <a href="notice.html">Introduction</a>
+
+        <a href="chooseMeeting.html">Meeting</a>
+        <a href="creatMeeting.html">ManageMeeting</a>
+        <a href="farm.html">Farm</a>
+        <a href="tree.html">Tree</a>
+        <a href="ranking.html">Ranking</a>
+    </nav>
+</header>
+<div class="container" style="margin: 100px 0 ">
+
+    <div class="main">
+        <div class="mainLeft">
+            <div class="menuItem" value="user">Contacts</div>
+            <div class="menuItem" value="message">Message</div>
+        </div>
+        <div class="mainRight">
+            <div class="tableContainer">
+                <table cellspacing="0">
+                    <thead>
+                    <tr style="background-color: #f4f4f4;font-weight: bold;color: #333;text-transform: uppercase;">
+                        <td style="width: 10px; border-right-color: transparent;"></td>
+                        <td>Name</td>
+                        <td>Username</td>
+                        <td>Type</td>
+                        <td>operate</td>
+                    </tr>
+                    </thead>
+                    <tbody id="usersContainer">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagerContainer">
+                <div class="prePageBtn pagerBtn pagerItem">previous</div>
+                <div class="pagerItem" style="display: flex;">
+                    <div class="curPageNum">1</div>
+                    <div>/</div>
+                    <div class="totalPageNum">1</div>
+                </div>
+                <div class="nextPageBtn pagerBtn pagerItem">next</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<template id="userRowTemplate" style="display: none;">
+    <tr>
+        <td class="avatar">##avatar##</td>
+        <td>##user_name##</td>
+        <td>##user_number##</td>
+        <td>##user_type##</td>
+        <td>##button##</td>
+    </tr>
+</template>
+
+</body>
+
+<script>
+
+    // 获取模板
+    var template = document.getElementById('userRowTemplate');
+
+    // 获取 avatar 元素
+    var avatarElement = template.content.querySelector('.avatar');
+
+    // 生成随机颜色函数
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    // 设置随机背景颜色
+    avatarElement.style.backgroundColor = getRandomColor();
+    function load() {
+        getPage(1);
+    }
+
+    function getPage(pageNum){
+        let usersContainer = $('#usersContainer');
+        usersContainer.html("");
+
+        let params = new URLSearchParams();
+        params.append('userId', sessionStorage.getItem('userId'));
+        params.append('current', pageNum);
+        let pageSize = 10;
+        params.append('size', pageSize);
+
+        // 发送GET请求
+        fetch(`/user/getOtherUsers?${params.toString()}`)
+            .then(response => response.json())
+            .then(rs => {
+                //修改总页数
+                const total = rs.data.total;
+                let totalPage = Math.floor(total/pageSize);
+                if (total%pageSize > 0){
+                    totalPage++;
+                }
+                onSearchSuc(totalPage);
+
+                const users = rs.data.list;
+                let templateHtml = $("#userRowTemplate").html();
+
+                let buttnHtml = '';
+                const userType = sessionStorage.getItem('user_type');
+                if (userType === "Administer"){
+                    buttnHtml = '<input type="button" value="delete" onclick="handleDelete(##userId##)" >';
+                }
+
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i];
+                    let rowButtonHtml = buttnHtml;
+                    if (rowButtonHtml != ''){
+                        rowButtonHtml = rowButtonHtml.replace('##userId##', user.id);
+                    }
+
+                    let rowHtml = templateHtml
+                        .replace('##avatar##', user.user_name.charAt(0).toUpperCase())
+                        .replace('##user_name##', user.user_name)
+                        .replace('##user_number##', user.user_number)
+                        .replace('##user_type##', user.user_type)
+                        .replace('##button##', rowButtonHtml);
+                    usersContainer.append(rowHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function handleDelete(userId){
+        // 发送GET请求
+        fetch('/user/deleteUserById?userId=' + userId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(rs => {
+                load()
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    const curPageName = "user";
+    $(document).ready(function () {
+        chechLogin();
+        initUserInfoBar()
+        initPager(getPage);
+        load();
+
+        $('.menuItem[value="user"]').addClass("menuItemActive");
+
+        $('.menuItem').click(function () {
+            var items = $('.menuItem');
+            var that = $(this);
+            onMenuItemClick(items, that)
+        });
+    });
+</script>
+</html>
