@@ -117,33 +117,29 @@
         fetch('/energy/getUsersEnergyByDate')
             .then(response => response.json())
             .then(energy => {
+                if (!Array.isArray(energy)) {
+                    throw new TypeError('Expected an array');
+                }
+
                 let userNameSet = new Set();
                 let dateSet = new Set();
-                let userNameList = [];
-                let dateList = [];
 
                 energy.forEach((item) => {
                     userNameSet.add(item.user_name);
                     dateSet.add(item.date);
                 });
 
-                userNameList = Array.from(userNameSet);
-                dateList = Array.from(dateSet);
+                let userNameList = Array.from(userNameSet);
+                let dateList = Array.from(dateSet);
 
-                let mydata = [];
-                for (let i = 0; i < userNameList.length; i++) {
-                    let list = [];
-                    energy.forEach((item) => {
-                        if (item.user_name === userNameList[i]) {
-                            list.push([item.date, item.energy]);
-                        }
-                    });
-                    mydata.push({
-                        data: list,
-                        name: userNameList[i],
-                        type: 'line'
-                    });
-                }
+                let mydata = userNameList.map(userName => {
+                    return {
+                        name: userName,
+                        type: 'line',
+                        data: energy.filter(item => item.user_name === userName)
+                            .map(item => item.date + '|' + item.energy) // 将日期和能量值拼接成字符串
+                    };
+                });
 
                 let myChart = echarts.init(document.getElementById('main'));
                 let option = {
@@ -156,17 +152,25 @@
                         trigger: 'axis'
                     },
                     xAxis: {
+                        type: 'category',
                         data: dateList
                     },
                     yAxis: {
                         type: 'value'
                     },
-                    series: mydata
+                    series: mydata.map(series => ({
+                        ...series,
+                        data: series.data.map(item => {
+                            const [date, energy] = item.split('|'); // 拆分字符串
+                            return { value: [date, energy] };
+                        })
+                    }))
                 };
                 myChart.setOption(option);
 
                 let currentUsername = sessionStorage.getItem('username');
-                let userData = energy.filter(item => item.user_name === currentUsername).map(item => [item.date, item.energy]);
+                let userData = energy.filter(item => item.user_name === currentUsername)
+                    .map(item => item.date + '|' + item.energy);
                 let userChart = echarts.init(document.getElementById('userChart'));
                 let userOption = {
                     backgroundColor: 'white',
@@ -178,13 +182,17 @@
                         trigger: 'axis'
                     },
                     xAxis: {
+                        type: 'category',
                         data: dateList
                     },
                     yAxis: {
                         type: 'value'
                     },
                     series: [{
-                        data: userData,
+                        data: userData.map(item => {
+                            const [date, energy] = item.split('|');
+                            return { value: [date, energy] };
+                        }),
                         name: currentUsername,
                         type: 'line'
                     }]
@@ -192,23 +200,27 @@
                 userChart.setOption(userOption);
 
             })
-            .catch(error => console.error('Error fetching leaderboard:', error));
+            .catch(error => console.error('Error fetching energy by date:', error));
     }
 
     function getUsersEnergySum() {
         fetch('/energy/getUsersEnergySum')
             .then(response => response.json())
             .then(energy => {
+                if (!Array.isArray(energy)) {
+                    throw new TypeError('Expected an array');
+                }
+
                 let userNameList = energy.map((item) => item.user_name);
                 let energyList = energy.map((item) => item.energy);
 
-                var mydata = [];
-                for (var i = 0; i < energy.length; i++) {
-                    mydata[i] = { value: energy[i].energy, name: energy[i].user_name };
-                }
+                let mydata = energy.map(item => ({
+                    value: item.energy,
+                    name: item.user_name
+                }));
 
-                var myChart2 = echarts.init(document.getElementById('main2'));
-                var option2 = {
+                let myChart2 = echarts.init(document.getElementById('main2'));
+                let option2 = {
                     backgroundColor: 'white',
                     title: {
                         text: 'User energy value',
@@ -250,8 +262,8 @@
                 };
                 myChart2.setOption(option2);
 
-                var myChart3 = echarts.init(document.getElementById('main3'));
-                var option3 = {
+                let myChart3 = echarts.init(document.getElementById('main3'));
+                let option3 = {
                     backgroundColor: 'white',
                     title: {
                         text: 'User energy value',
@@ -284,7 +296,7 @@
                 myChart3.setOption(option3);
 
             })
-            .catch(error => console.error('Error fetching leaderboard:', error));
+            .catch(error => console.error('Error fetching energy sum:', error));
     }
 
     window.onload = function () {
@@ -320,6 +332,7 @@
         sessionStorage.removeItem('user_type');
         window.location.href = "logins.html";
     }
+
 </script>
 
 </body>
