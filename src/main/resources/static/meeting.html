@@ -210,14 +210,13 @@
   <ul id="participants"></ul>
 </div>
 
-<div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+<div id="popup" style="display: none; z-index: 10000; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
   <p id="popupMessage"></p>
 </div>
 
 <script>
   // JavaScript代码
 
-  // 显示弹窗函数
   function showPopup(message) {
     var popup = document.getElementById('popup');
     var popupMessage = document.getElementById('popupMessage');

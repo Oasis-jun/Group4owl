@@ -113,119 +113,60 @@
 <script src="/js/echarts.min.js"></script>
 
 <script type="text/javascript">
-
-    function getRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    function fetchLeaderboard() {
-        fetch('/game/leaderboard')
-            .then(response => response.json())
-            .then(users => {
-                const leaderboardElement = document.getElementById('leaderboard');
-                leaderboardElement.innerHTML = '';
-                users.forEach(user => {
-                    const userElement = document.createElement('div');
-                    userElement.className = 'user';
-                    const avatarColor = getRandomColor();
-                    userElement.innerHTML = `
-                        <div class="user-info">
-                            <div class="avatar" style="background-color: ${avatarColor};">
-                                ${user.user_name.charAt(0).toUpperCase()}
-                            </div>
-                            <span>${user.user_name}</span>
-                        </div>
-                        <div class="energy-bar">
-                            <div class="energy-fill" style="width: ${user.energy}%"></div>
-                        </div>
-                        <span>${user.energy}</span>
-                    `;
-                    leaderboardElement.appendChild(userElement);
-                });
-
-                const userNameList = users.map(user => user.user_name);
-                const energyList = users.map(user => user.energy);
-
-                const mydata = users.map(user => ({ value: user.energy, name: user.user_name }));
-
-                const myChart = echarts.init(document.getElementById('main'));
-
-                const option = {
-                    backgroundColor: 'white',
-                    title: {
-                        text: 'User Energy Value',
-                        left: 'center',
-                    },
-                    tooltip: {},
-                    legend: {
-                        data: ['Energy value'],
-                        left: 'right',
-                        bottom: 'center'
-                    },
-                    xAxis: {
-                        data: userNameList
-                    },
-                    yAxis: {},
-                    series: [
-                        {
-                            name: 'Energy value',
-                            type: 'bar',
-                            data: energyList
-                        },
-                        {
-                            name: 'Energy value',
-                            type: 'line',
-                            data: energyList
-                        }
-                    ]
-                };
-
-                myChart.setOption(option);
-            })
-            .catch(error => console.error('Error fetching leaderboard:', error));
-    }
-
     function getUsersEnergyByDate() {
         fetch('/energy/getUsersEnergyByDate')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('跨域请求问题：', 'Network response was not ok'); // 输出跨域请求问题
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(energy => {
+                if (!Array.isArray(energy)) {
+                    console.error('错误处理：', 'Unexpected response format: energy is not an array'); // 输出错误处理问题
+                    throw new Error('Unexpected response format: energy is not an array');
+                }
+
                 let userNameSet = new Set();
                 let dateSet = new Set();
+                let userNameList = [];
+                let dateList = [];
 
                 energy.forEach((item) => {
                     userNameSet.add(item.user_name);
                     dateSet.add(item.date);
                 });
 
-                let userNameList = Array.from(userNameSet);
-                let dateList = Array.from(dateSet).sort();
+                userNameList = Array.from(userNameSet);
+                dateList = Array.from(dateSet);
 
-                let mydata = userNameList.map(userName => {
-                    return {
-                        name: userName,
-                        type: 'line',
-                        data: energy.filter(item => item.user_name === userName)
-                            .map(item => [item.date, item.energy])
-                    };
-                });
+                let mydata = [];
+                for (let i = 0; i < userNameList.length; i++) {
+                    let list = [];
+                    energy.forEach((item) => {
+                        if (item.user_name === userNameList[i]) {
+                            list.push([item.date, item.energy]);
+                        }
+                    });
+                    mydata.push({
+                        data: list,
+                        name: userNameList[i],
+                        type: 'line'
+                    });
+                }
 
                 let myChart = echarts.init(document.getElementById('main'));
                 let option = {
                     backgroundColor: 'white',
                     title: {
-                        text: 'User Energy Value',
+                        text: 'User energy value',
                         left: "center",
                     },
                     tooltip: {
                         trigger: 'axis'
                     },
                     xAxis: {
-                        type: 'category',
                         data: dateList
                     },
                     yAxis: {
@@ -236,8 +177,7 @@
                 myChart.setOption(option);
 
                 let currentUsername = sessionStorage.getItem('username');
-                let userData = energy.filter(item => item.user_name === currentUsername)
-                    .map(item => [item.date, item.energy]);
+                let userData = energy.filter(item => item.user_name === currentUsername).map(item => [item.date, item.energy]);
                 let userChart = echarts.init(document.getElementById('userChart'));
                 let userOption = {
                     backgroundColor: 'white',
@@ -249,7 +189,6 @@
                         trigger: 'axis'
                     },
                     xAxis: {
-                        type: 'category',
                         data: dateList
                     },
                     yAxis: {
@@ -269,21 +208,32 @@
 
     function getUsersEnergySum() {
         fetch('/energy/getUsersEnergySum')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('网络问题：', 'Network response was not ok'); // 输出网络问题
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(energy => {
+                if (!Array.isArray(energy)) {
+                    console.error('错误处理：', 'Unexpected response format: energy is not an array'); // 输出错误处理问题
+                    throw new Error('Unexpected response format: energy is not an array');
+                }
+
                 let userNameList = energy.map((item) => item.user_name);
                 let energyList = energy.map((item) => item.energy);
 
-                let mydata = energy.map(item => ({
-                    value: item.energy,
-                    name: item.user_name
-                }));
+                var mydata = [];
+                for (var i = 0; i < energy.length; i++) {
+                    mydata[i] = { value: energy[i].energy, name: energy[i].user_name };
+                }
 
-                let myChart2 = echarts.init(document.getElementById('main2'));
-                let option2 = {
+                var myChart2 = echarts.init(document.getElementById('main2'));
+                var option2 = {
                     backgroundColor: 'white',
                     title: {
-                        text: 'User Energy Value',
+                        text: 'User energy value',
                         left: "center",
                     },
                     tooltip: {
@@ -322,11 +272,11 @@
                 };
                 myChart2.setOption(option2);
 
-                let myChart3 = echarts.init(document.getElementById('main3'));
-                let option3 = {
+                var myChart3 = echarts.init(document.getElementById('main3'));
+                var option3 = {
                     backgroundColor: 'white',
                     title: {
-                        text: 'User Energy Value',
+                        text: 'User energy value',
                         left: "center",
                     },
                     tooltip: {
@@ -359,8 +309,8 @@
             .catch(error => console.error('Error fetching energy sum:', error));
     }
 
+
     window.onload = function () {
-        fetchLeaderboard();
         getUsersEnergyByDate();
         getUsersEnergySum();
 
@@ -393,7 +343,6 @@
         sessionStorage.removeItem('user_type');
         window.location.href = "logins.html";
     }
-
 
 </script>
 
