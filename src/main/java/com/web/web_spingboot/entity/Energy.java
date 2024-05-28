@@ -9,11 +9,9 @@ public class Energy {
     private int energy;
     private LocalDate date;
 
-    // 无参数构造函数
     public Energy() {
     }
 
-    // 全参数构造函数
     public Energy(Long id, String user_name, int energy, LocalDate date) {
         this.id = id;
         this.user_name = user_name;
@@ -21,7 +19,6 @@ public class Energy {
         this.date = date;
     }
 
-    // Getter 和 Setter 方法
 
     public Long getId() {
         return id;

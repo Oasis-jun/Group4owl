@@ -17,9 +17,6 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
-/**
- * 消息接口
- */
 @RestController
 @RequestMapping("/message")
 public class MessageController {

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -178,6 +176,20 @@
             z-index: 999;
         }
 
+        .energy-box {
+            position: absolute;
+            top: 50px;
+            right: 30px;
+            background-color: lightblue;
+            color: #1E90FF;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
 
 
     </style>
@@ -210,11 +222,36 @@
 </div>
 
 <img class="guide_image" src="img/farmboard.png" alt="guide image" width="200">
+<div id="energyValue" class="energy-box">Green Energy</div>
 
 
 <script>
+    function fetchUserEnergy() {
+        var userId = sessionStorage.getItem('userId');
+        if (userId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/user/getEnergy?userId=" + userId, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var energyValue = document.getElementById("energyValue");
+                    energyValue.textContent = "Green Energy: " + xhr.responseText;
+                    var energyValue1 = parseInt(xhr.responseText);
+                    if (energyValue1 > 50) {
+                        setVisibilityInUnity(true);
+                    } else {
+                        setVisibilityInUnity(false);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    }
 
-    window.onload = function() {checkAndRestorePlantingState();};
+
+    window.onload = function() {
+        checkAndRestorePlantingState();
+        fetchUserEnergy();
+    };
 
     let plantingState = {};
 

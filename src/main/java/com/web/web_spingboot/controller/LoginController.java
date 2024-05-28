@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 
-/**
- * 登录页面逻辑
- * by xx 24/03
- */
 @RestController
 public class LoginController {
     @Autowired

@@ -32,11 +32,11 @@
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
-      background-color: rgba(255, 255, 255, 0.2); /* 半透明背景 */
+      background-color: rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px); /* 毛玻璃效果 */
-      -webkit-backdrop-filter: blur(10px); /* 为兼容性添加前缀 */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       position: relative;
       z-index: 1;
     }
@@ -187,7 +187,7 @@
 
 <div id="container">
   <div>
-    <p>Welcome, <span id="usernameDisplay"></span>!</p>
+    <p>Welcome to conference, <span id="usernameDisplay"></span>!</p>
     <label for="username">Please enter your nickname:</label>
     <input type="text" id="username">
     <button onclick="joinConference()">Join Conference</button>
@@ -204,8 +204,9 @@
     <button onclick="sendMessage()">Send</button>
   </div>
   <button onclick="leaveConference()">Leave Conference</button>
-  <div id="energyValue"></div>
-  <div id="energyDisplay"></div>
+  <div id="energyValue" style="color: #1E90FF; font-weight: bold; font-size: 20px;"></div>
+  <div id="energyDisplay" style="color: #1E90FF; font-size: 20px;"></div>
+
   <p>Participants</p>
   <ul id="participants"></ul>
 </div>
@@ -215,7 +216,6 @@
 </div>
 
 <script>
-  // JavaScript代码
 
   function showPopup(message) {
     var popup = document.getElementById('popup');
@@ -224,7 +224,6 @@
     popup.style.display = 'block';
   }
 
-  // 隐藏弹窗函数
   function hidePopup() {
     var popup = document.getElementById('popup');
     popup.style.display = 'none';
@@ -232,8 +231,8 @@
 
 
   var stompClient = null;
-  var username = ''; // 用户昵称
-  var isJoined = false; // 是否已经成功加入会议的标志
+  var username = '';
+  var isJoined = false;
 
 
   // var stompClient = null;
@@ -242,49 +241,48 @@
   var remoteVideo = document.getElementById('remoteVideo');
   var participantsList = document.getElementById('participants');
   var chatBox = document.getElementById('chatBox');
-  var energyDisplay = document.getElementById('energyDisplay'); // 能量值显示的地方
-  var reconnectInterval = 1000; // 重连间隔时间 (毫秒)
-  var isConnected = false; // 连接状态标志
-  // var energy = 1; // 能量值
-  // var lastMessageTime = null; // 上次发送消息的时间
+  var energyDisplay = document.getElementById('energyDisplay');
+  var reconnectInterval = 1000;
+  var isConnected = false;
+  // var energy = 1;
+  // var lastMessageTime = null;
 
   var systemMessageBox = document.getElementById('systemMessageBox');
 
   // Colors for avatars
   var avatarColors = ['#ff6347', '#4682b4', '#6a5acd', '#32cd32', '#ff69b4'];
 
+  var messageCount = 0;
 
   var cartItems = sessionStorage.getItem('username');
   document.getElementById('usernameDisplay').textContent = cartItems;
 
-  // 获取用户能量值并显示在页面上
   function fetchUserEnergy() {
-    var userId = sessionStorage.getItem('userId'); // 从sessionStorage中获取用户ID
+    var userId = sessionStorage.getItem('userId');
     if (userId) {
       var xhr = new XMLHttpRequest();
       xhr.open("GET", "/user/getEnergy?userId=" + userId, true);
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           var energyValue = document.getElementById("energyValue");
-          energyValue.textContent = "Energy: " + xhr.responseText; // 将能量值显示在页面上
+          energyValue.textContent = "Energy: " + xhr.responseText;
         }
       };
       xhr.send();
     }
   }
 
-  // 在页面加载完成后调用函数
   window.onload = function () {
     fetchUserEnergy();
   };
 
-  // 连接函数中添加弹窗显示和隐藏
+
   function connect() {
-    showPopup('Please wait while connecting to the conference room...'); // 在连接过程中显示提示
+    showPopup('Please wait while connecting to the conference room...');
     var socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame) {
-      hidePopup(); // 连接成功后隐藏提示
+      hidePopup();
       console.log('Connected: ' + frame);
       isJoined = true;
       isConnected = true;
@@ -368,14 +366,15 @@
     participantsList.innerHTML = participantsHTML;
   }
 
-  var messageCount = 1; // 全局变量，用于计数发送的消息次数
+
 
   function sendMessage() {
-
     if (!isJoined) {
       alert('Please join the conference first.');
       return;
     }
+
+    messageCount++;
     var messageInput = document.getElementById('chatInput');
     var message = messageInput.value.trim();
     if (message !== '') {
@@ -386,18 +385,6 @@
         sender: username
       };
 
-      // // 检查是否超过能量值上限
-      // if (energy >= 30) {
-      //   console.log("You have reached the maximum energy limit for today in the conference.");
-      //   return;
-      // }
-
-      // 更新能量值显示
-
-      energyDisplay.textContent = 'Message Count: ' + messageCount + '(Energy increases once for every five messages sent)';
-
-
-
       // Choose avatar color based on participant list length
       var colorIndex = participantsList.getElementsByTagName('li').length % avatarColors.length;
       var avatarColor = avatarColors[colorIndex];
@@ -405,20 +392,16 @@
       stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
       messageInput.value = '';
 
-
-      messageCount++;
-
-
       if (messageCount % 5 === 0) {
         increaseEnergyBySteal();
+        fetchUserEnergy(); // Move fetchUserEnergy() here to ensure it updates immediately
         messageCount = 0;
-        updateEnergyDisplay()
       }
 
-
-      fetchUserEnergy();
+      energyDisplay.textContent = 'Message Count: ' + messageCount + ' (Energy will increase 10 for every 5 messages sent)';
     }
   }
+
 
   function displayMessage(chatMessage) {
     console.log('Received message:', chatMessage);
@@ -476,23 +459,16 @@
   // Function to update the displayed energy value
   function updateEnergyDisplay() {
     var energyDisplay = document.getElementById('energyDisplay');
-    energyDisplay.textContent = 'Energy: ' + energy;
+    energyDisplay.textContent = 'Green Energy: ' + energy;
   }
 
 
-  // // Function to increase energy
-  // function increaseEnergy(amount) {
-  //   // Update energy value
-  //   energy += amount;
-  //   // Update displayed energy value
-  //   updateEnergyDisplay();
-  // }
+
 
   function increaseEnergyBySteal() {
     var username = sessionStorage.getItem('username');
     if (!username) {
-      console.error('在 sessionStorage 中找不到用户名。');
-      alert('请登录以收获能量。');
+      console.error('在 sessionStorage 中找不到用户名');
       return;
     }
 
@@ -503,7 +479,7 @@
       time: currentTime
     };
 
-    // 第一个 fetch 请求，发送到 /game/steal
+
     fetch('/game/steal', {
       method: 'POST',
       headers: {
@@ -526,7 +502,7 @@
               alert('Failed to add energy：' + error.message);
             });
 
-    // 第二个 fetch 请求，发送到 /energy/steal
+
     fetch('/energy/steal', {
       method: 'POST',
       headers: {
@@ -564,13 +540,14 @@
     username = document.getElementById('username').value;
     if (username === '') {
       alert('Please enter your nickname before joining the conference.');
-      return; // 如果没有输入昵称，停止进一步操作
+      return;
     }
+
     if (username === 'admin') {
       document.getElementById('adminControls').style.display = 'block';
     }
     connect();
-    displaySystemMessage(username + ' joined the conference'); // Display system message for user joining conference
+    displaySystemMessage(username + ' joined the conference');
   }
 
 
@@ -585,7 +562,7 @@
       stompClient.send("/app/leave", {}, oldUsername); // Use the old username to send leave message
       stompClient.disconnect();
     }
-    participantsList.innerHTML = ''; // 清空参与者列表
+    participantsList.innerHTML = '';
 
     console.log('You left the conference');
     displaySystemMessage(oldUsername + ' left the conference'); // Display system message for user leaving conference

@@ -9,20 +9,20 @@
 
   var doc = win.document;
   var config = {
-    modules: {}, // 模块物理路径
-    status: {}, // 模块加载状态
-    timeout: 10, // 符合规范的模块请求最长等待秒数
-    event: {} // 模块自定义事件
+    modules: {},
+    status: {},
+    timeout: 10,
+    event: {}
   };
 
   var Layui = function(){
-    this.v = '2.9.8'; // Layui 版本号
+    this.v = '2.9.8';
   };
 
-  // 识别预先可能定义的指定全局对象
+
   var GLOBAL = win.LAYUI_GLOBAL || {};
 
-  // 获取 layui 所在目录
+
   var getPath = function(){
     var jsPath = doc.currentScript ? doc.currentScript.src : function(){
       var js = doc.scripts;
@@ -40,7 +40,7 @@
     return config.dir = GLOBAL.dir || jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
   }();
 
-  // 异常提示
+
   var error = function(msg, type){
     type = type || 'log';
     win.console && console[type] && console[type]('layui error hint: ' + msg);
@@ -48,32 +48,31 @@
 
   var isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]';
 
-  // 内置模块
   var modules = config.builtin = {
-    lay: 'lay', // 基础 DOM 操作
-    layer: 'layer', // 弹层
-    laydate: 'laydate', // 日期
-    laypage: 'laypage', // 分页
-    laytpl: 'laytpl', // 模板引擎
-    form: 'form', // 表单集
-    upload: 'upload', // 上传
-    dropdown: 'dropdown', // 下拉菜单
-    transfer: 'transfer', // 穿梭框
-    tree: 'tree', // 树结构
-    table: 'table', // 表格
-    treeTable: 'treeTable', // 树表
-    element: 'element', // 常用元素操作
-    rate: 'rate',  // 评分组件
-    colorpicker: 'colorpicker', // 颜色选择器
-    slider: 'slider', // 滑块
-    carousel: 'carousel', // 轮播
-    flow: 'flow', // 流加载
-    util: 'util', // 工具块
-    code: 'code', // 代码修饰器
-    jquery: 'jquery', // DOM 库（第三方）
+    lay: 'lay',
+    layer: 'layer',
+    laydate: 'laydate',
+    laypage: 'laypage',
+    laytpl: 'laytpl',
+    form: 'form',
+    upload: 'upload',
+    dropdown: 'dropdown',
+    transfer: 'transfer',
+    tree: 'tree',
+    table: 'table',
+    treeTable: 'treeTable',
+    element: 'element',
+    rate: 'rate',
+    colorpicker: 'colorpicker',
+    slider: 'slider',
+    carousel: 'carousel',
+    flow: 'flow',
+    util: 'util',
+    code: 'code',
+    jquery: 'jquery',
 
     all: 'all',
-    'layui.all': 'layui.all' // 聚合标识（功能性的，非真实模块）
+    'layui.all': 'layui.all'
   };
 
   // 记录基础数据
@@ -106,7 +105,7 @@
     return that;
   };
 
-  // 使用特定模块
+
   Layui.prototype.use = function(apps, callback, exports, from){
     var that = this;
     var dir = config.dir = config.dir ? config.dir : getPath;
@@ -116,7 +115,7 @@
       if(typeof apps === 'string'){
         return [apps];
       }
-      // 当第一个参数为 function 时，则自动加载所有内置模块，且执行的回调即为该 function 参数；
+
       else if(typeof apps === 'function'){
         callback = apps;
         return ['all'];

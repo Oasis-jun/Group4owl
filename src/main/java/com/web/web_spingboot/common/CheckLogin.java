@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSession;
 public class CheckLogin {
     public static void check(Integer userId){
         if(userId == null){
-            throw new BizException("没登录");
+            throw new BizException("Not Login");
         }
     }
 }
