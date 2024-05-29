@@ -191,7 +191,6 @@
         }
 
 
-
     </style>
 </head>
 
@@ -412,6 +411,7 @@
                 storePlantingState();
                 console.log("Successfully harvested energy！");
                 alert("Energy increased by 10 points！");
+                fetchUserEnergy();
             })
             .catch(error => {
                 console.error('Error harvesting energy：', error);
